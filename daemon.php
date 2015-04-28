@@ -17,9 +17,7 @@ $breakfast = false;
 $breakfast_always = false;
 $lunch = false;
 $dinner = false;
-$all = true;
-
-$cookie = md5(microtime());
+$all = false;
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
