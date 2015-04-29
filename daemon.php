@@ -2,6 +2,7 @@
 define("COOKIE_c_user", '');
 define("COOKIE_xs", '');
 define("pageurl", 'gshsmeal');
+define("APIKEY", '201300000001');
 
 date_default_timezone_set('Asia/Seoul');
 
@@ -13,11 +14,15 @@ foreach($allergy_desc as &$i) {
 	$i = '(' . $i . ', ) ';
 }
 
-$breakfast = false;
-$breakfast_always = false;
-$lunch = false;
-$dinner = false;
-$all = false;
+define("TYPE_NONE", 1);
+define("TYPE_BREAKFAST", 2);
+define("TYPE_BREAKFAST_ALWAYS", 3);
+define("TYPE_LUNCH", 4);
+define("TYPE_DINNER", 5);
+define("TYPE_ALL", 6);
+define("TYPE_GANSIK", 7);
+
+$type = TYPE_GANSIK;
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -72,7 +77,7 @@ while(1) {
 	unset($food);
 	for($i = 0; $i < 5; $i++) {
 		$food[$i] = array();
-		curl_setopt($ch, CURLOPT_URL, 'http://student.gs.hs.kr/student/api/meal/meal.do?key=201300000001&month=' . date('Ym', time() + 86400 * $i) . '&date=' . date('d', time() + 86400 * $i));
+		curl_setopt($ch, CURLOPT_URL, 'http://student.gs.hs.kr/student/api/meal/meal.do?key=' . APIKEY . '&month=' . date('Ym', time() + 86400 * $i) . '&date=' . date('d', time() + 86400 * $i));
 		$data = curl_exec($ch);
 		$data = json_decode($data, true)['meal']['data'][0];
 		foreach($data as $key=>$val) {
@@ -93,65 +98,86 @@ while(1) {
 	}
 
 	$result_final = '';
-	if ($breakfast == true) {
-		echo "Posting breakfast\n";
-		$breakfast = false;
-		foreach($delicious as $key => $val) {
-			if (mb_strpos($food[0][0], $key) !== false) {
-				$result_final = '오늘 아침에 여러분들 좋아하는 ' . $val . ' 나왔습니다. 꼭 아침식사하시고 등교하시기 바랍니다.';
+	switch ($type) {
+		case TYPE_BREAKFAST:
+			echo "Posting breakfast\n";
+			$type = TYPE_NONE;
+			foreach($delicious as $key => $val) {
+				if (mb_strpos($food[0][0], $key) !== false) {
+					$result_final = '오늘 아침에 여러분들 좋아하는 ' . $val . ' 나왔습니다. 꼭 아침식사하시고 등교하시기 바랍니다.';
+				}
 			}
-		}
-		if ($result_final == '' && mb_strpos($food[0][0], '스프') !== false) {
-			$result_final = '오늘 아침이 맛있을 것으로 추정됩니다. 꼭 아침식사하시고 등교하시기 바랍니다.';
-		}
-		if ($result_final !== '') fb_post($result_final);
-	} else if ($breakfast_always === true) {
-		echo "Posting breakfast_always\n";
-		$breakfast_always = false;
-		$result_final = "--- 오늘 아침 ---\n";
-		$result_final .= $food[0][0];
-		fb_post($result_final);
-	} else if ($lunch == true) {
-		echo "Posting lunch\n";
-		$lunch = false;
-		$result_final = "--- 오늘 점심 ---\n";
-		$result_final .= $food[0][1];
-		fb_post($result_final);
-	} else if ($dinner == true) {
-		echo "Posting dinner\n";
-		$dinner = false;
-		$result_final = "--- 오늘 저녁 ---\n";
-		$result_final .= $food[0][2];
-		fb_post($result_final);
-	} else if ($all == true) {
-		unset($food[0]);
-		foreach($food as $key=>$val) {
-			$result_final .= "\n";
-			$result_final .= date('m월 d일 급식', time() + 86400 * $key);
-			$result_final .= "\n";
-			$result_final .= '- 아침' . "\n" . $val[0] . "\n";
-			$result_final .= '- 점심' . "\n" . $val[1] . "\n";
-			$result_final .= '- 저녁' . "\n" . $val[2] . "\n";
-			$result_final .= '--------------------';
-		}
-		fb_post($result_final);
+			if ($result_final == '' && mb_strpos($food[0][0], '스프') !== false) {
+				$result_final = '오늘 아침이 맛있을 것으로 추정됩니다. 꼭 아침식사하시고 등교하시기 바랍니다.';
+			}
+			if ($result_final !== '') fb_post($result_final);
+			break;
+		case TYPE_BREAKFAST_ALWAYS:
+			echo "Posting breakfast_always\n";
+			$type = TYPE_NONE;
+			$result_final = "--- 오늘 아침 ---\n";
+			$result_final .= $food[0][0];
+			fb_post($result_final);
+			break;
+		case TYPE_LUNCH:
+			echo "Posting lunch\n";
+			$type = TYPE_NONE;
+			$result_final = "--- 오늘 점심 ---\n";
+			$result_final .= $food[0][1];
+			fb_post($result_final);
+			break;
+		case TYPE_DINNER:
+			echo "Posting dinner\n";
+			$type = TYPE_NONE;
+			$result_final = "--- 오늘 저녁 ---\n";
+			$result_final .= $food[0][2];
+			fb_post($result_final);
+			break;
+		case TYPE_ALL:
+			unset($food[0]);
+			$type = TYPE_NONE;
+			foreach($food as $key=>$val) {
+				$result_final .= "\n";
+				$result_final .= date('m월 d일 급식', time() + 86400 * $key);
+				$result_final .= "\n";
+				$result_final .= '- 아침' . "\n" . $val[0] . "\n";
+				$result_final .= '- 점심' . "\n" . $val[1] . "\n";
+				$result_final .= '- 저녁' . "\n" . $val[2] . "\n";
+				$result_final .= '--------------------';
+			}
+			fb_post($result_final);
+			break;
+		case TYPE_GANSIK;
+			curl_setopt($ch, CURLOPT_URL, 'http://woqja125.dothome.co.kr/' . date('Y.m') . '.php?ad=1');
+			$data = curl_exec($ch);
+			preg_match_all('/<([0-9]+)>(.*)<\/[0-9]+>/U', $data, $match);
+			foreach($match[1] as $key=>$val) {
+				$gansik[$val] = str_replace("<br />", "\n", $match[2][$key]);
+			}
+			$result_final = "--- 오늘 간식 ---\n";
+			$result_final .= $gansik[date('d')];
+			fb_post($result_final);
+			break;
+		default:
 	}
-
-
 
 	$time = time() + 3600 * 9;
 
-	while(!($time % 86400 === 0 || $time % 86400 === 39600 || $time % 86400 === 25200 || $time % 86400 === 57600 || $time % 86400 === 75600)) {
+	while(!($time % 86400 === 0 || $time % 86400 === 39600 || $time % 86400 === 25200 || $time % 86400 === 57600 || $time % 86400 === 75600 || $time % 86400 === 68400)) {
 		usleep(700000);
 		$time = time() + 3600 * 9;
 	}
 	if ($time % 86400 === 0) {
-		$breakfast_always = true;
+		$type = TYPE_BREAKFAST_ALWAYS;
 	} else if ($time % 86400 === 25200) {
-		$breakfast = true;
+		$type = TYPE_BREAKFAST;
 	} else if ($time % 86400 === 39600) {
-		$lunch = true;
+		$type = TYPE_LUNCH;
 	} else if ($time % 86400 === 57600) {
-		$dinner = true;
+		$type = TYPE_DINNER;
+	} else if ($time % 86400 === 75600) {
+		$type = TYPE_ALL;
+	} else if ($time % 86400 === 68400) {
+		$type = TYPE_GANSIK;
 	}
 }
