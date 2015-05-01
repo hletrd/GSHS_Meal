@@ -147,6 +147,7 @@ while(1) {
 			fb_post($result_final);
 			break;
 		case TYPE_GANSIK;
+			if (!isset($gansik[date('d')])) break;
 			curl_setopt($ch, CURLOPT_URL, 'http://woqja125.dothome.co.kr/' . date('Y.m') . '.php?ad=1');
 			$data = curl_exec($ch);
 			preg_match_all('/<([0-9]+)>(.*)<\/[0-9]+>/U', $data, $match);
