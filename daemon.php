@@ -22,7 +22,7 @@ define("TYPE_DINNER", 5);
 define("TYPE_ALL", 6);
 define("TYPE_GANSIK", 7);
 
-$type = TYPE_GANSIK;
+$type = TYPE_NONE;
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -137,13 +137,12 @@ while(1) {
 			unset($food[0]);
 			$type = TYPE_NONE;
 			foreach($food as $key=>$val) {
-				$result_final .= "\n";
+				if ($result_final != '') $result_final .= "\n--------------------\n";
 				$result_final .= date('m월 d일 급식', time() + 86400 * $key);
 				$result_final .= "\n";
-				$result_final .= '- 아침' . "\n" . $val[0] . "\n";
-				$result_final .= '- 점심' . "\n" . $val[1] . "\n";
-				$result_final .= '- 저녁' . "\n" . $val[2] . "\n";
-				$result_final .= '--------------------';
+				$result_final .= '-- 아침 --' . "\n" . $val[0] . "\n";
+				$result_final .= '-- 점심 --' . "\n" . $val[1] . "\n";
+				$result_final .= '-- 저녁 --' . "\n" . $val[2] . "\n";
 			}
 			fb_post($result_final);
 			break;
