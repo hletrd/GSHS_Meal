@@ -115,6 +115,7 @@ while(1) {
 		case TYPE_BREAKFAST_ALWAYS:
 			echo "Posting breakfast_always\n";
 			$type = TYPE_NONE;
+			if ($food[0][0] === '정보 없음') break;
 			$result_final = "--- 오늘 아침 ---\n";
 			$result_final .= $food[0][0];
 			fb_post($result_final);
@@ -122,6 +123,7 @@ while(1) {
 		case TYPE_LUNCH:
 			echo "Posting lunch\n";
 			$type = TYPE_NONE;
+			if ($food[0][1] === '정보 없음') break;
 			$result_final = "--- 오늘 점심 ---\n";
 			$result_final .= $food[0][1];
 			fb_post($result_final);
@@ -129,6 +131,7 @@ while(1) {
 		case TYPE_DINNER:
 			echo "Posting dinner\n";
 			$type = TYPE_NONE;
+			if ($food[0][2] === '정보 없음') break;
 			$result_final = "--- 오늘 저녁 ---\n";
 			$result_final .= $food[0][2];
 			fb_post($result_final);
