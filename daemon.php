@@ -105,6 +105,7 @@ while(1) {
 			foreach($delicious as $key => $val) {
 				if (mb_strpos($food[0][0], $key) !== false) {
 					$result_final = '오늘 아침에 여러분들 좋아하는 ' . $val . ' 나왔습니다. 꼭 아침식사하시고 등교하시기 바랍니다.';
+					break;
 				}
 			}
 			if ($result_final == '' && mb_strpos($food[0][0], '스프') !== false) {
