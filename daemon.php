@@ -108,7 +108,7 @@ while(1) {
 					break;
 				}
 			}
-			if ($result_final == '' && mb_strpos($food[0][0], '스프') !== false || $result_final == '' && mb_strpos($food[0][0], '죽') !== false) {
+			if ($result_final == '' && mb_strpos($food[0][0], '스프') !== false || $result_final == '' && mb_strpos($food[0][0], '죽') !== false || $result_final == '' && mb_strpos($food[0][0], '시리얼') !== false) {
 				$result_final = '오늘 아침이 맛있을 것으로 추정됩니다. 꼭 아침식사하시고 등교하시기 바랍니다.';
 			}
 			if ($result_final !== '') fb_post($result_final);
