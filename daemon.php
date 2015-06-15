@@ -94,6 +94,8 @@ while(1) {
 			$j = str_replace('|', "\n* ", $j);
 			$j = preg_replace('/[0-9]+\\(/', '(', $j);
 			$j = preg_replace('/\\) [0-9]+/', ')', $j);
+			$j = preg_replace('/[0-9]+\\n/', "\n", $j);
+			$j = preg_replace('/[0-9]+$/', "", $j);
 			$j = '* ' . $j;
 			if (trim($j) == '*') $j = '정보 없음';
 		}
