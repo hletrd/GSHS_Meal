@@ -8,7 +8,7 @@ date_default_timezone_set('Asia/Seoul');
 
 $allergy = array('①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫', '⑬');
 $allergy_desc = array('난류', '우유', '메밀', '땅콩', '대두', '밀', '고등어', '게', '새우', '돼지고기', '복숭아', '토마토', '아황산염');
-$delicious = array('비요뜨' => '삐요뜨', '허니버터아몬드' => '허니버터아몬드', '뚝심햄구이' => '뚝심햄구이', '잉글리쉬머핀' => '잉글리쉬머핀(맥모닝)', '후룻볼' => '후룻볼', '김구이' => '김구이', '크로슈무슈' => '크로슈무슈', '요구르트(MBP)' => 'MBP 요구르트', '생크림토스트' => '생크림 없는 생크림토스트');
+$delicious = array('비요뜨' => '삐요뜨', '허니버터아몬드' => '허니버터아몬드', '뚝심햄구이' => '뚝심햄구이', '잉글리쉬머핀' => '잉글리쉬머핀(맥모닝)', '후룻볼' => '후룻볼', '김구이' => '김구이', '크로슈무슈' => '크로슈무슈');
 
 foreach($allergy_desc as &$i) {
 	$i = '(' . $i . ', ) ';
@@ -22,7 +22,7 @@ define("TYPE_DINNER", 5);
 define("TYPE_ALL", 6);
 define("TYPE_GANSIK", 7);
 
-$type = TYPE_NONE;
+$type = TYPE_GANSIK;
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -91,7 +91,7 @@ while(1) {
 			$j = str_replace(') (', '', $j);
 			$j = str_replace(', )', ')', $j);
 			$j = str_replace('|', "\n* ", $j);
-			$j = preg_replace('/[0-9]+[,①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬]/', '', $j);
+			$j = preg_replace('/[0-9]+/', '', $j);
 			$j = '* ' . $j;
 			if (trim($j) == '*') $j = '정보 없음';
 		}
@@ -101,21 +101,19 @@ while(1) {
 	switch ($type) {
 		case TYPE_BREAKFAST:
 			echo "Posting breakfast\n";
-			$type = TYPE_NONE;
 			foreach($delicious as $key => $val) {
 				if (mb_strpos($food[0][0], $key) !== false) {
 					$result_final = '오늘 아침에 여러분들 좋아하는 ' . $val . ' 나왔습니다. 꼭 아침식사하시고 등교하시기 바랍니다.';
 					break;
 				}
 			}
-			if ($result_final == '' && mb_strpos($food[0][0], '스프') !== false || $result_final == '' && mb_strpos($food[0][0], '죽') !== false || $result_final == '' && mb_strpos($food[0][0], '시리얼') !== false) {
+			if ($result_final == '' && mb_strpos($food[0][0], '스프') !== false) {
 				$result_final = '오늘 아침이 맛있을 것으로 추정됩니다. 꼭 아침식사하시고 등교하시기 바랍니다.';
 			}
 			if ($result_final !== '') fb_post($result_final);
 			break;
 		case TYPE_BREAKFAST_ALWAYS:
 			echo "Posting breakfast_always\n";
-			$type = TYPE_NONE;
 			if ($food[0][0] === '정보 없음') break;
 			$result_final = "--- 오늘 아침 ---\n";
 			$result_final .= $food[0][0];
@@ -123,7 +121,6 @@ while(1) {
 			break;
 		case TYPE_LUNCH:
 			echo "Posting lunch\n";
-			$type = TYPE_NONE;
 			if ($food[0][1] === '정보 없음') break;
 			$result_final = "--- 오늘 점심 ---\n";
 			$result_final .= $food[0][1];
@@ -131,7 +128,6 @@ while(1) {
 			break;
 		case TYPE_DINNER:
 			echo "Posting dinner\n";
-			$type = TYPE_NONE;
 			if ($food[0][2] === '정보 없음') break;
 			$result_final = "--- 오늘 저녁 ---\n";
 			$result_final .= $food[0][2];
@@ -139,7 +135,7 @@ while(1) {
 			break;
 		case TYPE_ALL:
 			unset($food[0]);
-			$type = TYPE_NONE;
+			echo "Posting all\n";
 			foreach($food as $key=>$val) {
 				if ($result_final != '') $result_final .= "\n--------------------\n";
 				$result_final .= date('m월 d일 급식', time() + 86400 * $key);
@@ -151,6 +147,7 @@ while(1) {
 			fb_post($result_final);
 			break;
 		case TYPE_GANSIK;
+			echo "Posting gansik\n";
 			curl_setopt($ch, CURLOPT_URL, 'http://woqja125.dothome.co.kr/' . date('Y.m') . '.php?ad=1');
 			$data = curl_exec($ch);
 			preg_match_all('/<([0-9]+)>(.*)<\/[0-9]+>/U', $data, $match);
@@ -163,6 +160,8 @@ while(1) {
 			break;
 		default:
 	}
+
+	$type = TYPE_NONE;
 
 
 	$time = time() + 3600 * 9;
