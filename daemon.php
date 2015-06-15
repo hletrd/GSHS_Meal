@@ -3,6 +3,7 @@ define("COOKIE_c_user", '');
 define("COOKIE_xs", '');
 define("pageurl", 'gshsmeal');
 define("APIKEY", '201300000001');
+define("offset", 0);
 
 date_default_timezone_set('Asia/Seoul');
 
@@ -22,7 +23,7 @@ define("TYPE_DINNER", 5);
 define("TYPE_ALL", 6);
 define("TYPE_GANSIK", 7);
 
-$type = TYPE_GANSIK;
+$type = TYPE_ALL;
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -77,7 +78,7 @@ while(1) {
 	unset($food);
 	for($i = 0; $i < 5; $i++) {
 		$food[$i] = array();
-		curl_setopt($ch, CURLOPT_URL, 'http://student.gs.hs.kr/student/api/meal/meal.do?key=' . APIKEY . '&month=' . date('Ym', time() + 86400 * $i) . '&date=' . date('d', time() + 86400 * $i));
+		curl_setopt($ch, CURLOPT_URL, 'http://student.gs.hs.kr/student/api/meal/meal.do?key=' . APIKEY . '&month=' . date('Ym', time() + 86400 * $i + 86400 * offset) . '&date=' . date('d', time() + 86400 * $i + 86400 * offset));
 		$data = curl_exec($ch);
 		$data = json_decode($data, true)['meal']['data'][0];
 		foreach($data as $key=>$val) {
@@ -91,7 +92,8 @@ while(1) {
 			$j = str_replace(') (', '', $j);
 			$j = str_replace(', )', ')', $j);
 			$j = str_replace('|', "\n* ", $j);
-			$j = preg_replace('/[0-9]+(/', '', $j);
+			$j = preg_replace('/[0-9]+\\(/', '(', $j);
+			$j = preg_replace('/\\) [0-9]+/', ')', $j);
 			$j = '* ' . $j;
 			if (trim($j) == '*') $j = '정보 없음';
 		}
