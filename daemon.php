@@ -10,6 +10,7 @@ date_default_timezone_set('Asia/Seoul');
 $allergy = array('①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫', '⑬');
 $allergy_desc = array('난류', '우유', '메밀', '땅콩', '대두', '밀', '고등어', '게', '새우', '돼지고기', '복숭아', '토마토', '아황산염');
 $delicious = array('비요뜨' => '삐요뜨', '허니버터아몬드' => '허니버터아몬드', '뚝심햄구이' => '뚝심햄구이', '잉글리쉬머핀' => '잉글리쉬머핀(맥모닝)', '후룻볼' => '후룻볼', '김구이' => '김구이', '크로슈무슈' => '크로슈무슈');
+$weekdays = array('일', '월', '화', '수', '목', '금', '토');
 
 foreach($allergy_desc as &$i) {
 	$i = '(' . $i . ', ) ';
@@ -142,7 +143,7 @@ while(1) {
 			echo "Posting all\n";
 			foreach($food as $key=>$val) {
 				if ($result_final != '') $result_final .= "\n--------------------\n";
-				$result_final .= date('m월 d일 급식', time() + 86400 * $key);
+				$result_final .= date('m월 d일 ' . $weekdays[date('w', time() + 86400 * $key)] . '요일 급식', time() + 86400 * $key);
 				$result_final .= "\n";
 				$result_final .= '-- 아침 --' . "\n" . $val[0] . "\n";
 				$result_final .= '-- 점심 --' . "\n" . $val[1] . "\n";
