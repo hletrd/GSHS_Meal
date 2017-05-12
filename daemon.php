@@ -17,6 +17,7 @@ date_default_timezone_set('Asia/Seoul');
 //$allergy = array('①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫', '⑬');
 $allergy = array('1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.', '10.', '11.', '12.', '13.');
 $allergy_desc = array('난류', '우유', '메밀', '땅콩', '대두', '밀', '고등어', '게', '새우', '돼지고기', '복숭아', '토마토', '아황산염');
+$allergy_desc = array('①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫', '⑬');
 $delicious = array('비요뜨' => '삐요뜨', '허니버터아몬드' => '허니버터아몬드', '뚝심햄구이' => '뚝심햄구이', '잉글리쉬머핀' => '잉글리쉬머핀(맥모닝)', '후룻볼' => '후룻볼', '김구이' => '김구이', '크로슈무슈' => '크로슈무슈', '시리얼' => '시리얼', '초코머핀' => '초코머핀');
 $weekdays = array('일', '월', '화', '수', '목', '금', '토');
 
@@ -91,7 +92,7 @@ function tw_post($status) {
 	
 	$twitter = new TwitterAPIExchange($GLOBALS['settings']);
 	$response = $twitter->buildOauth($url, $method)->setPostfields($fields)->performRequest();
-	echo 'Uploaded one!\n';
+	echo "Uploaded one!\n";
 	//var_dump(json_decode($response));
 }
 
@@ -174,6 +175,7 @@ while(1) {
 			break;
 		default:
 	}
+	echo "Waiting...";
 
 	$type = TYPE_NONE;
 
