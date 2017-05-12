@@ -4,12 +4,20 @@ define("COOKIE_xs", '');
 define("pageurl", 'gshsmeal');
 define("APIKEY", '201300000001');
 define("offset", 0);
+require_once('TwitterAPIExchange.php');
+$settings = array(
+	'oauth_access_token' => "",
+	'oauth_access_token_secret' => "",
+	'consumer_key' => "",
+	'consumer_secret' => ""
+);
 
 date_default_timezone_set('Asia/Seoul');
 
-$allergy = array('①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫', '⑬');
+//$allergy = array('①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫', '⑬');
+$allergy = array('1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.', '10.', '11.', '12.', '13.');
 $allergy_desc = array('난류', '우유', '메밀', '땅콩', '대두', '밀', '고등어', '게', '새우', '돼지고기', '복숭아', '토마토', '아황산염');
-$delicious = array('비요뜨' => '삐요뜨', '허니버터아몬드' => '허니버터아몬드', '뚝심햄구이' => '뚝심햄구이', '잉글리쉬머핀' => '잉글리쉬머핀(맥모닝)', '후룻볼' => '후룻볼', '김구이' => '김구이', '크로슈무슈' => '크로슈무슈', '시리얼' => '시리얼');
+$delicious = array('비요뜨' => '삐요뜨', '허니버터아몬드' => '허니버터아몬드', '뚝심햄구이' => '뚝심햄구이', '잉글리쉬머핀' => '잉글리쉬머핀(맥모닝)', '후룻볼' => '후룻볼', '김구이' => '김구이', '크로슈무슈' => '크로슈무슈', '시리얼' => '시리얼', '초코머핀' => '초코머핀');
 $weekdays = array('일', '월', '화', '수', '목', '금', '토');
 
 foreach($allergy_desc as &$i) {
@@ -120,21 +128,21 @@ while(1) {
 		case TYPE_BREAKFAST_ALWAYS:
 			echo "Posting breakfast_always\n";
 			if ($food[0][0] === '정보 없음') break;
-			$result_final = "--- 오늘 아침 ---\n";
+			$result_final = "-- 오늘 아침 --\n";
 			$result_final .= $food[0][0];
 			fb_post($result_final);
 			break;
 		case TYPE_LUNCH:
 			echo "Posting lunch\n";
 			if ($food[0][1] === '정보 없음') break;
-			$result_final = "--- 오늘 점심 ---\n";
+			$result_final = "-- 오늘 점심 --\n";
 			$result_final .= $food[0][1];
 			fb_post($result_final);
 			break;
 		case TYPE_DINNER:
 			echo "Posting dinner\n";
 			if ($food[0][2] === '정보 없음') break;
-			$result_final = "--- 오늘 저녁 ---\n";
+			$result_final = "-- 오늘 저녁 --\n";
 			$result_final .= $food[0][2];
 			fb_post($result_final);
 			break;
@@ -151,18 +159,6 @@ while(1) {
 			}
 			fb_post($result_final);
 			break;
-		case TYPE_GANSIK;
-			echo "Posting gansik\n";
-			curl_setopt($ch, CURLOPT_URL, 'http://woqja125.dothome.co.kr/' . date('Y.m') . '.php?ad=1');
-			$data = curl_exec($ch);
-			preg_match_all('/<([0-9]+)>(.*)<\/[0-9]+>/U', $data, $match);
-			foreach($match[1] as $key=>$val) {
-				$gansik[$val] = str_replace("<br />", "\n", $match[2][$key]);
-			}
-			$result_final = "--- 오늘 간식 ---\n";
-			$result_final .= $gansik[date('d')];
-			fb_post($result_final);
-			break;
 		default:
 	}
 
@@ -171,8 +167,8 @@ while(1) {
 
 	$time = time() + 3600 * 9;
 
-	while(!($time % 86400 === 0 || $time % 86400 === 39600 || $time % 86400 === 25200 || $time % 86400 === 57600 || $time % 86400 === 75600 || $time % 86400 === 68400)) {
-		usleep(700000);
+	while(!($time % 86400 === 0 || $time % 86400 === 39600 || $time % 86400 === 25200 || $time % 86400 === 57600 /* || $time % 86400 === 75600 || $time % 86400 === 68400 */)) {
+		usleep(400000);
 		$time = time() + 3600 * 9;
 	}
 	if ($time % 86400 === 0) {
@@ -183,9 +179,9 @@ while(1) {
 		$type = TYPE_LUNCH;
 	} else if ($time % 86400 === 57600) {
 		$type = TYPE_DINNER;
-	} else if ($time % 86400 === 75600) {
+	}/* else if ($time % 86400 === 75600) {
 		$type = TYPE_ALL;
 	} else if ($time % 86400 === 68400) {
 		$type = TYPE_GANSIK;
-	}
+	}*/
 }
