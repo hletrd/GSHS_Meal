@@ -32,7 +32,7 @@ define("TYPE_DINNER", 5);
 define("TYPE_ALL", 6);
 define("TYPE_GANSIK", 7);
 
-$type = TYPE_ALL;
+$type = TYPE_BREAKFAST;
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -82,6 +82,19 @@ function fb_post($text) {
 	echo 'Posted(' . date("Y-m-d H:i:s") . '): ' . $text . "\n";
 }
 
+function tw_post($status) {
+	$fields = array(
+		'status' => $status,
+	);
+	$url = 'https://api.twitter.com/1.1/statuses/update.json';
+	$method = 'POST';
+	
+	$twitter = new TwitterAPIExchange($GLOBALS['settings']);
+	$response = $twitter->buildOauth($url, $method)->setPostfields($fields)->performRequest();
+	echo 'Uploaded one!\n';
+	//var_dump(json_decode($response));
+}
+
 while(1) {
 	echo "Daemon started...\n";
 	unset($food);
@@ -123,28 +136,28 @@ while(1) {
 			if ($result_final == '' && (mb_strpos($food[0][0], '스프') !== false || mb_strpos($food[0][0], '우유') !== false)) {
 				$result_final = '오늘 아침이 맛있을 것으로 추정됩니다. 꼭 아침식사하시고 등교하시기 바랍니다.';
 			}
-			if ($result_final !== '') fb_post($result_final);
+			if ($result_final !== '') tw_post($result_final);
 			break;
 		case TYPE_BREAKFAST_ALWAYS:
 			echo "Posting breakfast_always\n";
 			if ($food[0][0] === '정보 없음') break;
 			$result_final = "-- 오늘 아침 --\n";
 			$result_final .= $food[0][0];
-			fb_post($result_final);
+			tw_post($result_final);
 			break;
 		case TYPE_LUNCH:
 			echo "Posting lunch\n";
 			if ($food[0][1] === '정보 없음') break;
 			$result_final = "-- 오늘 점심 --\n";
 			$result_final .= $food[0][1];
-			fb_post($result_final);
+			tw_post($result_final);
 			break;
 		case TYPE_DINNER:
 			echo "Posting dinner\n";
 			if ($food[0][2] === '정보 없음') break;
 			$result_final = "-- 오늘 저녁 --\n";
 			$result_final .= $food[0][2];
-			fb_post($result_final);
+			tw_post($result_final);
 			break;
 		case TYPE_ALL:
 			unset($food[0]);
@@ -157,7 +170,7 @@ while(1) {
 				$result_final .= '-- 점심 --' . "\n" . $val[1] . "\n";
 				$result_final .= '-- 저녁 --' . "\n" . $val[2] . "\n";
 			}
-			fb_post($result_final);
+			tw_post($result_final);
 			break;
 		default:
 	}
