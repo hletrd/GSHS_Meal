@@ -6,8 +6,8 @@ define("APIKEY", '201300000001');
 define("offset", 0);
 require_once('TwitterAPIExchange.php');
 $settings = array(
-	'oauth_access_token' => "",
-	'oauth_access_token_secret' => "",
+	'oauth_access_token' => "",   
+	'oauth_access_token_secret' => "", 
 	'consumer_key' => "",
 	'consumer_secret' => ""
 );
@@ -33,7 +33,7 @@ define("TYPE_DINNER", 5);
 define("TYPE_ALL", 6);
 define("TYPE_GANSIK", 7);
 
-$type = TYPE_BREAKFAST;
+$type = TYPE_DINNER;
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -95,9 +95,8 @@ function tw_post($status) {
 	echo "Uploaded one!\n";
 	//var_dump(json_decode($response));
 }
-
+echo "Daemon started...\n";
 while(1) {
-	echo "Daemon started...\n";
 	unset($food);
 	for($i = 0; $i < 5; $i++) {
 		$food[$i] = array();
@@ -142,21 +141,21 @@ while(1) {
 		case TYPE_BREAKFAST_ALWAYS:
 			echo "Posting breakfast_always\n";
 			if ($food[0][0] === '정보 없음') break;
-			$result_final = "-- 오늘 아침 --\n";
+			$result_final = "- " . date("m-d") . " 아침\n";
 			$result_final .= $food[0][0];
 			tw_post($result_final);
 			break;
 		case TYPE_LUNCH:
 			echo "Posting lunch\n";
 			if ($food[0][1] === '정보 없음') break;
-			$result_final = "-- 오늘 점심 --\n";
+			$result_final = "- " . date("m-d") . " 점심\n";
 			$result_final .= $food[0][1];
 			tw_post($result_final);
 			break;
 		case TYPE_DINNER:
 			echo "Posting dinner\n";
 			if ($food[0][2] === '정보 없음') break;
-			$result_final = "-- 오늘 저녁 --\n";
+			$result_final = "- " . date("m-d") . " 저녁\n";
 			$result_final .= $food[0][2];
 			tw_post($result_final);
 			break;
@@ -182,11 +181,11 @@ while(1) {
 
 	$time = time() + 3600 * 9;
 
-	while(!($time % 86400 === 0 || $time % 86400 === 39600 || $time % 86400 === 25200 || $time % 86400 === 57600 /* || $time % 86400 === 75600 || $time % 86400 === 68400 */)) {
+	while(!($time % 86400 === 25160 || $time % 86400 === 39600 || $time % 86400 === 25200 || $time % 86400 === 57600 /* || $time % 86400 === 75600 || $time % 86400 === 68400 */)) {
 		usleep(400000);
 		$time = time() + 3600 * 9;
 	}
-	if ($time % 86400 === 0) {
+	if ($time % 86400 === 25160) {
 		$type = TYPE_BREAKFAST_ALWAYS;
 	} else if ($time % 86400 === 25200) {
 		$type = TYPE_BREAKFAST;
